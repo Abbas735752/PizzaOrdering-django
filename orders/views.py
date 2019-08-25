@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.models import User
 from .models import Topping, Regular_Pizza , Sicilian_Pizza , Cart  , Orders
-
+#here from django.xyz search for it import decorator
 
 # Create your views here.
 def index(request):
@@ -31,7 +31,7 @@ def login_view(request):
 		return HttpResponseRedirect(reverse("index"))
 	else:
 		return render(request , "orders/login.html" , {"message":"Invalid credentials"})
-
+@login_required
 def logout_view(request):
 	logout(request)
 	return render(request , "orders/login.html" , {"message":"Logout successfully "})
@@ -60,7 +60,7 @@ def add_items(request , pizza_name ,small , large):
 	"toppings" : toppings
 	}
 	return render(request , "orders/add_items.html" , context)
-
+@login_required#login required for user its a decorator
 def add_to_cart(request , item):
 	name = item
 	size = request.POST.get("size")
@@ -69,7 +69,7 @@ def add_to_cart(request , item):
 	c.save()
 	c.user.set([request.user])
 	return HttpResponseRedirect(reverse("index"))
-	
+@login_required	
 def show_cart(request):
 	cart = Cart.objects.filter(user=request.user)
 
@@ -78,7 +78,7 @@ def show_cart(request):
 	"user" : request.user.username
 	}
 	return render(request , "orders/cart.html" , context)
-
+@login_required
 def place_order(request , item , size ,extras , pk):
 	order = Orders(item=item , size=size , extras=extras)
 	order.save()
@@ -86,7 +86,7 @@ def place_order(request , item , size ,extras , pk):
 	Cart.objects.get(pk=pk).delete()
 	return HttpResponseRedirect(reverse("index"))
 
-
+@login_required
 def view_orders(request):
 	orders = Orders.objects.all()
 	context = {
